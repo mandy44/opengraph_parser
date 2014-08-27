@@ -1,4 +1,4 @@
-require 'net/https'
+require 'open-uri'
 
 class RedirectFollower
   REDIRECT_DEFAULT_LIMIT = 5
@@ -18,23 +18,23 @@ class RedirectFollower
   def resolve
     raise TooManyRedirects if redirect_limit < 0
 
-    uri = URI.parse(URI.escape(url))
+    # uri = URI.parse(URI.escape(url))
+    #
+    # http = Net::HTTP.new(uri.host, uri.port)
+    # if uri.scheme == 'https'
+    #   http.use_ssl = true
+    #   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    # end
+    #
+    # self.response = http.request_get(uri.request_uri, @headers)
+    #
+    # if response.kind_of?(Net::HTTPRedirection)
+    #   self.url = redirect_url
+    #   self.redirect_limit -= 1
+    #   resolve
+    # end
 
-    http = Net::HTTP.new(uri.host, uri.port)
-    if uri.scheme == 'https'
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-    end
-
-    self.response = http.request_get(uri.request_uri, @headers)
-
-    if response.kind_of?(Net::HTTPRedirection)
-      self.url = redirect_url
-      self.redirect_limit -= 1
-      resolve
-    end
-
-    self.body = response.body
+    self.body = open(self.url).read
     self
   end
 
